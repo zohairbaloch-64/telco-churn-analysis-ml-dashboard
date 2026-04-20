@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+import numpy as np
 
 # -------------------- PAGE CONFIG --------------------
 st.set_page_config(
@@ -130,6 +131,16 @@ df_model["Churn"] = target_encoder.fit_transform(df_model["Churn"])
 X = df_model.drop("Churn", axis=1)
 y = df_model["Churn"]
 feature_columns = X.columns.tolist()
+dtypes = X.dtypes
+
+# Convert to numpy arrays to avoid pandas conversion issues in sklearn
+X = X.values
+y = y.values
+
+# Ensure no NaN or inf values
+if np.any(np.isnan(X)) or np.any(np.isinf(X)) or np.any(np.isnan(y)) or np.any(np.isinf(y)):
+    st.error("Data contains NaN or infinite values after preprocessing. Please check the data.")
+    st.stop()
 
 model = RandomForestClassifier(n_estimators=200, random_state=42)
 model.fit(X, y)
@@ -140,7 +151,7 @@ st.subheader("📈 Feature Importance")
 
 importances = model.feature_importances_
 feat_df = pd.DataFrame({
-    "Feature": X.columns,
+    "Feature": feature_columns,
     "Importance": importances
 }).sort_values(by="Importance", ascending=False)
 
@@ -172,7 +183,7 @@ input_dict = {
 }
 
 # Fill missing columns with default values
-for col in X.columns:
+for col in feature_columns:
     if col not in input_dict:
         input_dict[col] = df[col].mode()[0]
 
@@ -194,7 +205,7 @@ for col in input_df.columns:
 default_values = {col: df[col].mode().iloc[0] for col in feature_columns}
 input_df = input_df.reindex(columns=feature_columns)
 input_df = input_df.fillna(default_values)
-input_df = input_df.astype(X.dtypes.to_dict())
+input_df = input_df.astype(dtypes.to_dict())
 
 # Prediction
 if st.button("Predict Churn"):
