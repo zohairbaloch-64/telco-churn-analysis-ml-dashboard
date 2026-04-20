@@ -129,6 +129,11 @@ target_encoder = LabelEncoder()
 df_model["Churn"] = target_encoder.fit_transform(df_model["Churn"])
 
 X = df_model.drop("Churn", axis=1)
+# Ensure all columns in X are numeric
+X = X.apply(pd.to_numeric, errors='coerce')
+df_model = pd.concat([X, df_model["Churn"]], axis=1)
+df_model.dropna(inplace=True)
+X = df_model.drop("Churn", axis=1)
 y = df_model["Churn"]
 feature_columns = X.columns.tolist()
 dtypes = X.dtypes
