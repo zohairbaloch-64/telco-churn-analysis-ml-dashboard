@@ -139,8 +139,8 @@ feature_columns = X.columns.tolist()
 dtypes = X.dtypes
 
 # Convert to numpy arrays to avoid pandas conversion issues in sklearn
-X = X.values
-y = y.values
+X = X.to_numpy(dtype=float)
+y = y.to_numpy(dtype=int)
 
 # Ensure no NaN or inf values
 if np.any(np.isnan(X)) or np.any(np.isinf(X)) or np.any(np.isnan(y)) or np.any(np.isinf(y)):
