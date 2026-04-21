@@ -56,3 +56,7 @@ The dataset includes customer demographics, account information, services, and c
 ## License
 
 This project is intended for educational and portfolio use.
+
+## 📊 Dashboard Preview
+
+![Dashboard](dashboard.png)
